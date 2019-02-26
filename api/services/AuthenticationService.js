@@ -1,5 +1,5 @@
 var jwt = require('jsonwebtoken'),
-  properties = sails.config.session.secret;
+  SECRET = sails.config.session.secret;
 
 module.exports = {
   generateToken: generateToken,
@@ -12,15 +12,16 @@ function generateToken(user) {
   if (!user) {
     return null;
   }
+
   // generate a user id and authenticate
   var payload = {
-    userInfo: user._id
+    userInfo: user.id
   };
+
   // return token and user information with a refresh token
   var options = {expiresIn: '6h'};
-  var secret = `${properties.SECRET}`;
 
-  return jwt.sign(payload, secret, options);
+  return jwt.sign(payload, SECRET, options);
 }
 
 function getAuthenticatedResponse(user) {
@@ -30,7 +31,7 @@ function getAuthenticatedResponse(user) {
 
   return {
     user: user,
-    token: generateToken(user[0])
+    token: generateToken(user)
   };
 }
 
@@ -40,7 +41,7 @@ function validateToken(authToken) {
     // validate the token
     try {
       // decode the token
-      authPayload = jwt.verify(authToken, `${properties.SECRET}`);
+      authPayload = jwt.verify(authToken, secret);
     } catch (err) {
       console.error('AuthenticationService#validateToken :: Error while ' +
         'verifying the token :: ', err);

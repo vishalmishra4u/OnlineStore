@@ -17,9 +17,8 @@ function signUp(req, res){
   User
   .signUp(body)
   .then(function(user){
-    var authenticatedResponse = AuthenticationService.getAuthenticatedResponse(user);
     res.json({
-      message : authenticatedResponse
+      user : user.user,
     });
   })
   .catch(function(error){
@@ -30,8 +29,13 @@ function signUp(req, res){
 }
 
 function login(req, res){
+  var loginData = {
+    emailId : req.query.emailId,
+    password : req.query.password
+  };
+
   User
-    .getForEmailPassword(req.body)
+    .getForEmailPassword(loginData)
     .then(function (user) {
       var data = {
         id : user.id,
@@ -41,11 +45,18 @@ function login(req, res){
         mobileNumber : user.mobileNumber
       };
 
-      var response = AuthenticationService.getAuthenticatedResponse({
-        user: data
+      var authenticatedResponse = AuthenticationService.getAuthenticatedResponse(user);
+      var customerUser = {
+        id : user.id,
+        name : user.name,
+        emailId : user.emailId,
+        address : user.address,
+        mobileNumber : user.mobileNumber
+      };
+      res.json({
+        user : customerUser,
+        token : authenticatedResponse.token
       });
-
-      res.json(response);
     })
     .catch(function (error) {
       sails.log.error('UserController#login :: Login error :: ', err);
