@@ -88,7 +88,6 @@ function generateUuid() {
 }
 
 function generateEncryptedPassword(password, salt) {
-  console.log();
   return Q.promise(function(resolve, reject) {
 
     crypto.pbkdf2(password, salt, 10, 512, 'sha512', function(err, encrypted) {

@@ -71,6 +71,22 @@ module.exports.routes = {
   'POST /order/placeOrder' : {
     controller : 'OrderController',
     action : 'placeOrder'
+  },
+
+  //Delivery guy routes
+  'POST /deliveryGuy/createDeliveryGuy' : {
+    controller : 'DeliveryGuyController',
+    action : 'createDeliveryGuy'
+  },
+
+  //Order tracking
+  'PUT /order/updateOrderLocation' : {
+    controller : 'OrderController',
+    action : 'updateOrderLocation'
+  },
+  'GET /order/getOrderLocation' : {
+    controller : 'OrderController',
+    action : 'getOrderLocation'
   }
 
 };

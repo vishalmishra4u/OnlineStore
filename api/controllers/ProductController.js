@@ -34,7 +34,7 @@ function updateProduct(req, res){
     .updateProduct(productDetails)
     .then(function(product){
       res.json({
-        product : product
+        product : product[0]
       });
     })
     .catch(function(error){
@@ -46,7 +46,7 @@ function updateProduct(req, res){
 
 function getProduct(req, res){
   Product
-    .findOne({id : req.param.id})
+    .findOne({id : req.query.id})
     .then(function(product){
       res.json({
         product : product
@@ -61,7 +61,7 @@ function getProduct(req, res){
 
 function deleteProduct(req, res){
   Product
-    .destroy({id : req.param.id})
+    .destroy({id : req.query.id})
     .then(function(){
       res.json({
         message : 'Product deleted successfully'

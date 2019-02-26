@@ -18,5 +18,8 @@ module.exports.policies = {
   ***************************************************************************/
 
   // '*': true,
+  OrderController : {
+    placeOrder : ['IsUserAuthenticated']
+  }
 
 };

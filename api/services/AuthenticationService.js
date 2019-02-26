@@ -1,6 +1,8 @@
 var jwt = require('jsonwebtoken'),
   SECRET = sails.config.session.secret;
 
+var Q = require('q');
+
 module.exports = {
   generateToken: generateToken,
   getAuthenticatedResponse: getAuthenticatedResponse,
@@ -19,7 +21,9 @@ function generateToken(user) {
   };
 
   // return token and user information with a refresh token
-  var options = {expiresIn: '6h'};
+  var options = {
+    expiresIn: '6h'
+  };
 
   return jwt.sign(payload, SECRET, options);
 }
@@ -37,18 +41,17 @@ function getAuthenticatedResponse(user) {
 
 function validateToken(authToken) {
   var authPayload;
-
+  return Q.promise(function (resolve, reject) {
     // validate the token
     try {
-      // decode the token
-      authPayload = jwt.verify(authToken, secret);
+      authPayload = jwt.verify(authToken.split(" ")[1], SECRET);
     } catch (err) {
-      console.error('AuthenticationService#validateToken :: Error while ' +
+      sails.log.error('AuthenticationService#validateToken :: Error while ' +
         'verifying the token :: ', err);
 
-      return {
-        message : 'Error in validating token'
-      };
+        return reject({
+          error: 'Error in validating'
+        });
     }
 
     // check if payload is an object
@@ -56,10 +59,21 @@ function validateToken(authToken) {
       sails.log.error('AuthenticationService#validateToke :: Unidentified ' +
         'payload :: ', authPayload);
 
-      return {
-        message: 'Invalid authentication for user!'
-      };
-    }else{
-      return;
+        return reject({
+          error: 'Invalid authentication for user!'
+        });
     }
+    var userId = authPayload.userInfo;
+    // get user for id
+    User
+      .findOne({id : userId})
+      .then(resolve)
+      .catch(function (err) {
+        sails.log.error('AuthenticationService#validateToken :: Error :: ', err);
+        // throw a 401 error
+        return reject({
+          error: 'Invalid authentication for user!'
+        });
+      });
+  });
 }

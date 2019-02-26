@@ -4,6 +4,7 @@
  * @description :: A model definition.  Represents a database table/collection/etc.
  * @docs        :: https://sailsjs.com/docs/concepts/models-and-orm/models
  */
+var Q = require('q');
 
 module.exports = {
 
@@ -16,10 +17,12 @@ module.exports = {
       required : true
     },
     totalDeliveries : {
-      type : 'number'
+      type : 'number',
+      defaultsTo : 0
     },
     avgRating : {
-      type : 'number'
+      type : 'number',
+      defaultsTo : 0
     },
     user : {
       model : 'user'
@@ -36,5 +39,26 @@ module.exports = {
       defaultsTo : true
     }
   },
-
+  createDeliveryGuy : createDeliveryGuy
 };
+
+function createDeliveryGuy(deliveryGuyDetails){
+  return Q.promise(function(resolve, reject) {
+    var details = {
+      govtIdProof : deliveryGuyDetails.govtIdProof,
+      proofNumber : deliveryGuyDetails.proofNumber,
+      user : deliveryGuyDetails.user,
+      store : deliveryGuyDetails.store
+    };
+
+    DeliveryGuy
+      .create(details)
+      .fetch()
+      .then(function(deliveryGuy){
+        return resolve(deliveryGuy);
+      })
+      .catch(function(error){
+        return reject(error);
+      });
+  });
+}
